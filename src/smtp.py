@@ -46,7 +46,11 @@ class PaperlessHandler:
         tag_pks = list(set(self.rcpt_to_tag_pks(rcpt_tos)))
 
         async with PaperlessClient() as client:
-            logger.info("Sending file to paperless for processing: %r, tags: %r", file_name, tag_pks)
+            logger.info(
+                "Sending file to paperless for processing: %r, tags: %r",
+                file_name,
+                tag_pks,
+            )
             response = await client.create_document(
                 data={"tags": tag_pks},
                 files={"document": (file_name, content_bytes, content_type)},

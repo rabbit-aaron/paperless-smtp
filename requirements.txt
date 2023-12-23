@@ -1,0 +1,30 @@
+aiosmtpd==1.4.4.post2 ; python_version >= "3.11" and python_version < "4.0" \
+    --hash=sha256:f821fe424b703b2ea391dc2df11d89d2afd728af27393e13cf1a3530f19fdc5e \
+    --hash=sha256:f9243b7dfe00aaf567da8728d891752426b51392174a34d2cf5c18053b63dcbc
+anyio==4.2.0 ; python_version >= "3.11" and python_version < "4.0" \
+    --hash=sha256:745843b39e829e108e518c489b31dc757de7d2131d53fac32bd8df268227bfee \
+    --hash=sha256:e1875bb4b4e2de1669f4bc7869b6d3f54231cdced71605e6e64c9be77e3be50f
+atpublic==4.0 ; python_version >= "3.11" and python_version < "4.0" \
+    --hash=sha256:0f40433219e124edf115c6c363808ca6f0e1cfa7d160d86b2fb94793086d1294 \
+    --hash=sha256:80057c55641253b86dcb68b524f82328172371b6547d4c7462a9127fbfbbabfc
+attrs==23.1.0 ; python_version >= "3.11" and python_version < "4.0" \
+    --hash=sha256:1f28b4522cdc2fb4256ac1a020c78acf9cba2c6b461ccd2c126f3aa8e8335d04 \
+    --hash=sha256:6279836d581513a26f1bf235f9acd333bc9115683f14f7e8fae46c98fc50e015
+certifi==2023.11.17 ; python_version >= "3.11" and python_version < "4.0" \
+    --hash=sha256:9b469f3a900bf28dc19b8cfbf8019bf47f7fdd1a65a1d4ffb98fc14166beb4d1 \
+    --hash=sha256:e036ab49d5b79556f99cfc2d9320b34cfbe5be05c5871b51de9329f0603b0474
+h11==0.14.0 ; python_version >= "3.11" and python_version < "4.0" \
+    --hash=sha256:8f19fbbe99e72420ff35c00b27a34cb9937e902a8b810e2c88300c6f0a3b699d \
+    --hash=sha256:e3fe4ac4b851c468cc8363d500db52c2ead036020723024a109d37346efaa761
+httpcore==1.0.2 ; python_version >= "3.11" and python_version < "4.0" \
+    --hash=sha256:096cc05bca73b8e459a1fc3dcf585148f63e534eae4339559c9b8a8d6399acc7 \
+    --hash=sha256:9fc092e4799b26174648e54b74ed5f683132a464e95643b226e00c2ed2fa6535
+httpx==0.26.0 ; python_version >= "3.11" and python_version < "4.0" \
+    --hash=sha256:451b55c30d5185ea6b23c2c793abf9bb237d2a7dfb901ced6ff69ad37ec1dfaf \
+    --hash=sha256:8915f5a3627c4d47b73e8202457cb28f1266982d1159bd5779d86a80c0eab1cd
+idna==3.6 ; python_version >= "3.11" and python_version < "4.0" \
+    --hash=sha256:9ecdbbd083b06798ae1e86adcbfe8ab1479cf864e4ee30fe4e46a003d12491ca \
+    --hash=sha256:c05567e9c24a6b9faaa835c4821bad0590fbb9d5779e7caa6e1cc4978e7eb24f
+sniffio==1.3.0 ; python_version >= "3.11" and python_version < "4.0" \
+    --hash=sha256:e60305c5e5d314f5389259b7f22aaa33d8f7dee49763119234af3755c55b9101 \
+    --hash=sha256:eecefdce1e5bbfb7ad2eeaabf7c1eeb404d7757c379bd1f7e5cce9d8bf425384
