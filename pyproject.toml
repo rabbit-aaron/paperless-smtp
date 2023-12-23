@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "paperless-smtp"
+version = "0.1.0"
+description = ""
+authors = ["rabbit-aaron <rabbit.aaron@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+aiosmtpd = "^1.4.4.post2"
+httpx = "^0.26.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
