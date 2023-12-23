@@ -7,7 +7,7 @@ class PaperlessClient(httpx.AsyncClient):
         kwargs["auth"] = httpx.BasicAuth(
             settings.PAPERLESS_USERNAME, settings.PAPERLESS_PASSWORD
         )
-        kwargs["base_url"] = f"{settings.PAPERLESS_URL.removesuffix(" / ")}/api"
+        kwargs["base_url"] = f"{settings.PAPERLESS_URL.removesuffix('/')}/api"
         super().__init__(*args, **kwargs)
 
     async def list_tags(self, *args, **kwargs):
