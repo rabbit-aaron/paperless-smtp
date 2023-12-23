@@ -5,34 +5,36 @@ from contextlib import suppress
 from functools import partial
 
 from aiosmtpd.smtp import SMTP
-from smtp import SMTPHandler
 
-_verbosity_to_log_level = {
-    0: logging.CRITICAL,
-    1: logging.ERROR,
-    2: logging.WARNING,
-    3: logging.INFO,
-}
+from paperless_client import PaperlessClient
+from smtp import PaperlessHandler
+
+
+logger = logging.getLogger("paperless_smtp")
+
+
+async def get_tag_mappings():
+    async with PaperlessClient() as client:
+        response = await client.list_tags(params={"page_size": 10000})
+        results = response.json()["results"]
+        return {i["slug"]: i["id"] for i in results}
 
 
 def main(host, port, loglevel=logging.ERROR):
+    tag_mappings = asyncio.run(get_tag_mappings())
     factory = partial(
         SMTP,
-        SMTPHandler(),
+        PaperlessHandler(tag_mappings=tag_mappings),
     )
 
     logging.basicConfig(level=logging.ERROR)
-    logger = logging.getLogger("aiosmtpd.log")
     loop = asyncio.new_event_loop()
 
     logger.setLevel(loglevel)
     logger.debug("Attempting to start server on %s:%s", host, port)
 
-    try:
-        server = loop.create_server(factory, host=host, port=port)
-        server_loop = loop.run_until_complete(server)
-    except RuntimeError:  # pragma: nocover
-        raise
+    server = loop.create_server(factory, host=host, port=port)
+    server_loop = loop.run_until_complete(server)
 
     logger.debug(f"server_loop = {server_loop}")
     logger.info("Server is listening on %s:%s", host, port)
@@ -55,4 +57,4 @@ def main(host, port, loglevel=logging.ERROR):
 
 
 if __name__ == "__main__":
-    main("127.0.0.1", 1025, logging.DEBUG)
+    main("0.0.0.0", 1025, logging.INFO)
