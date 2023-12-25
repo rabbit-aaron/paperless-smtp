@@ -53,6 +53,7 @@ class PaperlessHandler:
         suffix = f"@{settings.EMAIL_DOMAIN}"
         for rcpt in rcpt_tos:
             if not rcpt.endswith(suffix):
+                logger.warning("%r email domain mismatch, ignored", rcpt)
                 continue
 
             tags_dotted = rcpt.removesuffix(suffix)
@@ -63,6 +64,9 @@ class PaperlessHandler:
         content_bytes = file.get_content()
         file_name = file.get_filename()
         content_type = file.get_content_type()
+
+        if not self.tag_mappings:
+            await self.refresh_tag_mappings()
 
         tags = self.rcpt_to_tags(rcpt_tos)
         tag_creation_tasks = [
