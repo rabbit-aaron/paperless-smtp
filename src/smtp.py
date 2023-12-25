@@ -25,6 +25,13 @@ class PaperlessHandler:
     async def refresh_tag_mappings(self) -> None:
         async with PaperlessClient() as client:
             response = await client.list_tags(params={"page_size": 10000})
+            if response.status_code != 200:
+                logger.error(
+                    "Something went wrong while trying to fetch tags from Paperless-ngx, status code %r, reason: %r",
+                    response.status_code,
+                    response.text,
+                )
+                raise SystemExit
             results = response.json()["results"]
             logger.info("Refreshing tag mappings from Paperless-ngx")
             self.tag_mappings = {i["slug"]: str(i["id"]) for i in results}
@@ -33,7 +40,9 @@ class PaperlessHandler:
     async def create_tag(self, name: str) -> dict:
         async with PaperlessClient() as client:
             logger.info("Creating tag %r", name)
-            response = await client.create_tag(json={"name": name, "slug": name, "matching_algorithm": 0})
+            response = await client.create_tag(
+                json={"name": name, "slug": name, "matching_algorithm": 0}
+            )
             if response.status_code != 201:
                 logger.error(
                     "Error creating tag %r, response code %r, reason: %r",
