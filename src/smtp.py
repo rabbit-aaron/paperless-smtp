@@ -77,7 +77,7 @@ class PaperlessHandler:
         if not self.tag_mappings:
             await self.refresh_tag_mappings()
 
-        tags = self.rcpt_to_tags(rcpt_tos)
+        tags = list(self.rcpt_to_tags(rcpt_tos))
         tag_creation_tasks = [
             self.create_tag(tag) for tag in tags if tag not in self.tag_mappings
         ]
@@ -86,7 +86,7 @@ class PaperlessHandler:
             await asyncio.gather(*tag_creation_tasks)
             await self.refresh_tag_mappings()
 
-        tag_pks = list(set(tag for tag in tags if tag in self.tag_mappings))
+        tag_pks = list(set(self.tag_mappings[tag] for tag in tags if tag in self.tag_mappings))
 
         async with PaperlessClient() as client:
             logger.info(
