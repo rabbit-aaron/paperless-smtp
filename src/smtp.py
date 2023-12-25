@@ -7,6 +7,7 @@ from typing import Generator, cast
 
 from aiosmtpd.smtp import SMTP, Session, Envelope
 
+import settings
 from paperless_client import PaperlessClient
 
 logger = logging.getLogger("paperless_smtp")
@@ -14,14 +15,33 @@ parser = Parser(_class=EmailMessage, policy=SMTPUTF8)
 
 
 def _mail_attachments(message: EmailMessage) -> Generator[MIMEPart, None, None]:
-    for part in message.walk():
-        if part.is_attachment():
-            yield part
+    return (part for part in message.walk() if part.is_attachment())
 
 
 class PaperlessHandler:
-    def __init__(self, tag_mappings: dict):
-        self.tag_mappings = tag_mappings
+    def __init__(self):
+        self.tag_mappings = {}
+
+    async def refresh_tag_mappings(self) -> None:
+        async with PaperlessClient() as client:
+            response = await client.list_tags(params={"page_size": 10000})
+            results = response.json()["results"]
+            logger.info("Refreshing tag mappings from Paperless-ngx")
+            self.tag_mappings = {i["slug"]: str(i["id"]) for i in results}
+            logger.info("Tag mappings updated, %r", self.tag_mappings)
+
+    async def create_tag(self, name: str) -> dict:
+        async with PaperlessClient() as client:
+            logger.info("Creating tag %r", name)
+            response = await client.create_tag(json={"name": name, "slug": name, "matching_algorithm": 0})
+            if response.status_code != 201:
+                logger.error(
+                    "Error creating tag %r, response code %r, reason: %r",
+                    name,
+                    response.status_code,
+                    response.text,
+                )
+            return response.json()
 
     async def handle_DATA(self, server: SMTP, session: Session, envelope: Envelope):
         message = cast(EmailMessage, parser.parsestr(envelope.content.decode("utf-8")))
@@ -29,21 +49,31 @@ class PaperlessHandler:
         await self.send_message_to_paperless(message, envelope.rcpt_tos)
         return "250 Message accepted for delivery"
 
-    def rcpt_to_tag_pks(self, rcpt_tos: list[str]) -> Generator[str, None, None]:
+    def rcpt_to_tags(self, rcpt_tos: list[str]) -> Generator[str, None, None]:
+        suffix = f"@{settings.EMAIL_DOMAIN}"
         for rcpt in rcpt_tos:
-            tags_dotted = rcpt.removesuffix("@local")
+            if not rcpt.endswith(suffix):
+                continue
+
+            tags_dotted = rcpt.removesuffix(suffix)
             for tag in tags_dotted.split("."):
-                try:
-                    yield self.tag_mappings[tag]
-                except KeyError:
-                    pass
+                yield tag
 
     async def send_file_to_paperless(self, file: MIMEPart, rcpt_tos: list[str]):
         content_bytes = file.get_content()
         file_name = file.get_filename()
         content_type = file.get_content_type()
 
-        tag_pks = list(set(self.rcpt_to_tag_pks(rcpt_tos)))
+        tags = self.rcpt_to_tags(rcpt_tos)
+        tag_creation_tasks = [
+            self.create_tag(tag) for tag in tags if tag not in self.tag_mappings
+        ]
+
+        if tag_creation_tasks:
+            await asyncio.gather(*tag_creation_tasks)
+            await self.refresh_tag_mappings()
+
+        tag_pks = list(set(tag for tag in tags if tag in self.tag_mappings))
 
         async with PaperlessClient() as client:
             logger.info(

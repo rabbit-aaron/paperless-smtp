@@ -13,5 +13,8 @@ class PaperlessClient(httpx.AsyncClient):
     async def list_tags(self, *args, **kwargs):
         return await self.get("tags/", *args, **kwargs)
 
+    async def create_tag(self, *args, **kwargs):
+        return await self.post("tags/", *args, **kwargs)
+
     async def create_document(self, *args, **kwargs):
         return await self.post("documents/post_document/", *args, **kwargs)

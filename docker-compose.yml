@@ -1,0 +1,15 @@
+version: "3.7"
+services:
+  paperless-ngx-smtp:
+    image: rabbitaaron/paperless-smtp
+    restart: unless-stopped
+    ports:
+      - "25:25"
+    environment:
+      EMAIL_DOMAIN: local  # only recipient matching <tag>.<tag>.<tag>@local will be processed
+      LOG_LEVEL: INFO
+      PAPERLESS_PASSWORD: mypassword
+      PAPERLESS_URL: http://mypaperless-ngx.com:8000
+      PAPERLESS_USERNAME: myusername
+      SMTP_HOST: "0.0.0.0"
+      SMTP_PORT: "1025"
