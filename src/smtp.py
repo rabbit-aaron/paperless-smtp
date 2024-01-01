@@ -67,7 +67,8 @@ class PaperlessHandler:
 
             tags_dotted = rcpt.removesuffix(suffix)
             for tag in tags_dotted.split("."):
-                yield tag
+                if tag != "notag":
+                    yield tag
 
     async def send_file_to_paperless(self, file: MIMEPart, rcpt_tos: list[str]):
         content_bytes = file.get_content()
@@ -87,6 +88,7 @@ class PaperlessHandler:
             await self.refresh_tag_mappings()
 
         tag_pks = list(set(self.tag_mappings[tag] for tag in tags if tag in self.tag_mappings))
+        data = {"tags": tag_pks} if tag_pks else None
 
         async with PaperlessClient() as client:
             logger.info(
@@ -95,7 +97,7 @@ class PaperlessHandler:
                 tag_pks,
             )
             response = await client.create_document(
-                data={"tags": tag_pks},
+                data=data,
                 files={"document": (file_name, content_bytes, content_type)},
             )
 
